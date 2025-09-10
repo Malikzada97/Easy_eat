@@ -14,8 +14,8 @@ declare global {
 
 // Prefer Vite env vars, fallback to window.APP_CONFIG (from config.local.js)
 // These env vars should be provided in .env.local as VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY
-const envSupabaseUrl = (import.meta as any)?.env?.VITE_SUPABASE_URL as string | undefined;
-const envSupabaseAnonKey = (import.meta as any)?.env?.VITE_SUPABASE_ANON_KEY as string | undefined;
+const envSupabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const envSupabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 const supabaseUrl = envSupabaseUrl || window.APP_CONFIG?.SUPABASE_URL;
 const supabaseAnonKey = envSupabaseAnonKey || window.APP_CONFIG?.SUPABASE_ANON_KEY;

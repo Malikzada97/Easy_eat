@@ -15,11 +15,18 @@ declare global {
 
 // Prefer Vite env vars, fallback to window.APP_CONFIG (from config.local.js)
 // These env vars should be provided in .env.local as VITE_GEMINI_API_KEY
-const envApiKey = (import.meta as any)?.env?.VITE_GEMINI_API_KEY as string | undefined;
+const envApiKey = import.meta.env.VITE_GEMINI_API_KEY;
 const apiKey = envApiKey || window.APP_CONFIG?.API_KEY;
 
 if (!apiKey || apiKey.startsWith('PASTE_YOUR')) {
-  throw new Error("Gemini API key not found or is a placeholder. Please set VITE_GEMINI_API_KEY in .env.local or add your valid API key to config.local.js as instructed in README.md.");
+  console.error('Environment variables debug:', {
+    VITE_GEMINI_API_KEY: import.meta.env.VITE_GEMINI_API_KEY,
+    envApiKey: envApiKey,
+    importMetaEnv: import.meta.env,
+    windowAppConfig: window.APP_CONFIG,
+    allEnvKeys: Object.keys(import.meta.env)
+  });
+  throw new Error("Gemini API key not found or is a placeholder. Please set VITE_GEMINI_API_KEY in your deployment environment variables or .env.local file.");
 }
 
 const ai = new GoogleGenAI({ apiKey });

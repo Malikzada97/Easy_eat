@@ -1,0 +1,5 @@
+{
+  "name": "Easy Eat AI POS",
+  "description": "A modern, AI-powered Point-of-Sale (POS) and inventory management system for small businesses. Features real-time analytics, inventory tracking, and natural language data queries powered by Gemini.",
+  "requestFramePermissions": []
+}

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Easy Eat AI POS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            colors: {
+              'primary': 'hsl(210, 40%, 50%)',
+              'primary-focus': 'hsl(210, 40%, 40%)',
+              'primary-content': 'hsl(0, 0%, 100%)',
+              'light-bg': 'hsl(210, 40%, 98%)',
+              'light-card': 'hsl(0, 0%, 100%)',
+              'light-text': 'hsl(210, 10%, 20%)',
+              'dark-bg': 'hsl(222, 47%, 11%)',
+              'dark-card': 'hsla(222, 40%, 15%, 0.5)',
+              'dark-text': 'hsl(210, 40%, 95%)',
+            },
+            boxShadow: {
+              'neumorphic-light': '8px 8px 16px #d1d9e6, -8px -8px 16px #ffffff',
+              'neumorphic-dark': '8px 8px 16px #1a1f2c, -8px -8px 16px #2a334a',
+            }
+          }
+        }
+      }
+    </script>
+  <script type="importmap">
+{
+  "imports": {
+    "react/": "https://aistudiocdn.com/react@^18.3.1/",
+    "react": "https://aistudiocdn.com/react@^18.3.1",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^18.3.1/",
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.17.0",
+    "recharts": "https://aistudiocdn.com/recharts@^3.1.2",
+    "@supabase/supabase-js": "https://aistudiocdn.com/@supabase/supabase-js@^2.45.0"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+  <body class="bg-light-bg dark:bg-dark-bg transition-colors duration-300">
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>

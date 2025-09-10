@@ -1,11 +1,11 @@
 -- Easy Eat AI POS - Supabase Database Schema
 -- Run this script in your Supabase SQL Editor
 
--- Enable Row Level Security
-ALTER DATABASE postgres SET "app.jwt_secret" TO 'your-jwt-secret';
+-- Drop and recreate products table to ensure correct schema
+DROP TABLE IF EXISTS products CASCADE;
 
 -- Products table
-CREATE TABLE IF NOT EXISTS products (
+CREATE TABLE products (
     id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     category VARCHAR(100) NOT NULL,
@@ -17,8 +17,11 @@ CREATE TABLE IF NOT EXISTS products (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
+-- Drop and recreate sales table
+DROP TABLE IF EXISTS sales CASCADE;
+
 -- Sales table
-CREATE TABLE IF NOT EXISTS sales (
+CREATE TABLE sales (
     id SERIAL PRIMARY KEY,
     items JSONB NOT NULL, -- Array of cart items
     total DECIMAL(10,2) NOT NULL,
@@ -26,8 +29,11 @@ CREATE TABLE IF NOT EXISTS sales (
     timestamp TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
+-- Drop and recreate expenses table
+DROP TABLE IF EXISTS expenses CASCADE;
+
 -- Expenses table
-CREATE TABLE IF NOT EXISTS expenses (
+CREATE TABLE expenses (
     id SERIAL PRIMARY KEY,
     description VARCHAR(255) NOT NULL,
     amount DECIMAL(10,2) NOT NULL,

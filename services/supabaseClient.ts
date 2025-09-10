@@ -24,10 +24,17 @@ const supabaseAnonKey = envSupabaseAnonKey || window.APP_CONFIG?.SUPABASE_ANON_K
 // This allows the app to fall back to mock data if Supabase is not configured.
 let supabase = null;
 
+console.log('Supabase initialization check:', {
+    envSupabaseUrl: envSupabaseUrl,
+    envSupabaseAnonKey: envSupabaseAnonKey ? 'Present' : 'Missing',
+    windowAppConfig: window.APP_CONFIG
+});
+
 if (supabaseUrl && supabaseAnonKey &&
     !supabaseUrl.startsWith('PASTE_YOUR') && !supabaseAnonKey.startsWith('PASTE_YOUR')) {
     try {
         supabase = createClient(supabaseUrl, supabaseAnonKey);
+        console.log('Supabase client initialized successfully');
     } catch (error) {
         console.error("Failed to initialize Supabase client. Check your Vite env or config.local.js.", error);
         supabase = null;

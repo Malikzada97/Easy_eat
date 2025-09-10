@@ -1,6 +1,6 @@
 import React, { createContext, useState, useEffect, ReactNode } from 'react';
 import { Product, Sale, Expense, UserRole, AppContextType } from '../types';
-import { fetchInitialData, addProductApi, updateProductApi, addSaleApi, addExpenseApi } from '../services/mockApi';
+import { fetchInitialData, addProduct, updateProduct, addSale, addExpense } from '../services/api';
 
 export const AppContext = createContext<AppContextType | null>(null);
 
@@ -32,18 +32,18 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         setTheme(prevTheme => (prevTheme === 'light' ? 'dark' : 'light'));
     };
 
-    const addProduct = async (productData: Omit<Product, 'id'>) => {
-        const newProduct = await addProductApi(productData);
+    const addProductHandler = async (productData: Omit<Product, 'id'>) => {
+        const newProduct = await addProduct(productData);
         setProducts(prev => [...prev, newProduct].sort((a, b) => a.name.localeCompare(b.name)));
     };
 
-    const updateProduct = async (productData: Product) => {
-        const updatedProduct = await updateProductApi(productData);
+    const updateProductHandler = async (productData: Product) => {
+        const updatedProduct = await updateProduct(productData);
         setProducts(prev => prev.map(p => p.id === updatedProduct.id ? updatedProduct : p).sort((a, b) => a.name.localeCompare(b.name)));
     };
 
-    const addSale = async (saleData: Omit<Sale, 'id' | 'timestamp'>) => {
-        const newSale = await addSaleApi(saleData);
+    const addSaleHandler = async (saleData: Omit<Sale, 'id' | 'timestamp'>) => {
+        const newSale = await addSale(saleData);
         setSales(prev => [newSale, ...prev]);
         // Also update product stock in the state
         newSale.items.forEach(item => {
@@ -53,8 +53,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         });
     };
     
-    const addExpense = async (expenseData: Omit<Expense, 'id'| 'date'>) => {
-        const newExpense = await addExpenseApi(expenseData);
+    const addExpenseHandler = async (expenseData: Omit<Expense, 'id'| 'date'>) => {
+        const newExpense = await addExpense(expenseData);
         setExpenses(prev => [newExpense, ...prev].sort((a, b) => b.date.getTime() - a.date.getTime()));
     };
 
@@ -64,12 +64,12 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         userRole,
         setUserRole,
         products,
-        addProduct,
-        updateProduct,
+        addProduct: addProductHandler,
+        updateProduct: updateProductHandler,
         sales,
-        addSale,
+        addSale: addSaleHandler,
         expenses,
-        addExpense,
+        addExpense: addExpenseHandler,
         isLoading,
     };
 

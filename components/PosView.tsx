@@ -16,42 +16,101 @@ const PosView: React.FC = () => {
     const [cart, setCart] = useState<CartItem[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('All');
-    const [lastSale, setLastSale] = useState<Omit<Sale, 'id' | 'timestamp'> | null>(null);
+    const [lastSale, setLastSale] = useState<Omit<Sale, 'id'> | null>(null);
 
     const receiptRef = useRef<HTMLDivElement>(null);
 
     const handlePrint = () => {
-        const receiptElement = receiptRef.current;
-        if (!receiptElement) return;
+        if (!lastSale) {
+            console.error('No sale data available for printing');
+            return;
+        }
+
+        console.log('Printing receipt for sale:', lastSale);
+        
+        // Create receipt HTML directly instead of relying on hidden element
+        const saleTime = lastSale.timestamp || new Date();
+        const receiptHTML = `
+            <div style="padding: 16px; background: white; color: black; font-family: monospace; font-size: 12px; width: 300px;">
+                <div style="text-align: center; margin-bottom: 16px;">
+                    <h1 style="font-weight: 700; font-size: 18px; margin: 0;">Easy Eat</h1>
+                    <p style="margin: 4px 0;">123 Food Street, Karachi</p>
+                    <p style="margin: 4px 0;">Thank you for your visit!</p>
+                </div>
+                <p style="margin: 8px 0;">Date: ${saleTime.toLocaleString()}</p>
+                <hr style="border: 0; border-top: 1px dashed #000; margin: 8px 0;" />
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr>
+                            <th style="text-align: left; padding: 2px 0;">Item</th>
+                            <th style="text-align: center; padding: 2px 0;">Qty</th>
+                            <th style="text-align: right; padding: 2px 0;">Price</th>
+                            <th style="text-align: right; padding: 2px 0;">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${lastSale.items.map(item => `
+                            <tr>
+                                <td style="text-align: left; padding-right: 4px;">${item.name}</td>
+                                <td style="text-align: center;">${item.quantity}</td>
+                                <td style="text-align: right; padding-left: 4px;">${item.price.toFixed(0)}</td>
+                                <td style="text-align: right; padding-left: 4px;">${(item.price * item.quantity).toFixed(0)}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+                <hr style="border: 0; border-top: 1px dashed #000; margin: 8px 0;" />
+                <div style="text-align: right; font-weight: 700;">
+                    <p style="margin: 4px 0;">TOTAL: PKR ${lastSale.total.toFixed(0)}</p>
+                    <p style="margin: 4px 0;">Paid via: ${lastSale.paymentMethod}</p>
+                </div>
+                <div style="text-align: center; margin-top: 16px;">
+                    <p style="margin: 0;">Come Again!</p>
+                </div>
+            </div>
+        `;
 
         const printWindow = window.open('', '_blank', 'noopener,noreferrer,width=400,height=600');
-        if (!printWindow) return;
+        if (!printWindow) {
+            // Fallback: try to print the current page
+            window.print();
+            setLastSale(null);
+            return;
+        }
 
         const html = `<!doctype html>
 <html>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Receipt</title>
+    <title>Receipt - Easy Eat</title>
     <style>
-      body { background: white; color: black; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
-      .text-right { text-align: right; }
-      .text-center { text-align: center; }
-      .font-bold { font-weight: 700; }
-      .text-xs { font-size: 12px; }
-      .w-\[300px\] { width: 300px; }
-      table { border-collapse: collapse; width: 100%; }
-      th, td { padding: 2px 0; }
-      hr { border: 0; border-top: 1px dashed #000; margin: 8px 0; }
-      .p-4 { padding: 16px; }
-      .mb-4 { margin-bottom: 16px; }
-      .pl-1 { padding-left: 4px; }
-      .pr-1 { padding-right: 4px; }
+      body { 
+        background: white; 
+        color: black; 
+        font-family: monospace;
+        margin: 0;
+        padding: 0;
+      }
+      @media print {
+        body { margin: 0; }
+        @page { margin: 0.5in; }
+      }
     </style>
   </head>
   <body>
-    ${receiptElement.outerHTML}
-    <script>window.focus(); window.print(); setTimeout(() => window.close(), 300);<\/script>
+    ${receiptHTML}
+    <script>
+      window.onload = function() {
+        setTimeout(function() {
+          window.focus();
+          window.print();
+          setTimeout(function() {
+            window.close();
+          }, 1000);
+        }, 100);
+      };
+    </script>
   </body>
  </html>`;
 
@@ -102,7 +161,7 @@ const PosView: React.FC = () => {
     const handleCheckout = async (paymentMethod: PaymentMethod) => {
         if (cart.length === 0) return;
         
-        const saleData = { items: cart, total, paymentMethod };
+        const saleData = { items: cart, total, paymentMethod, timestamp: new Date() };
         await addSale(saleData);
         setLastSale(saleData);
         clearCart();

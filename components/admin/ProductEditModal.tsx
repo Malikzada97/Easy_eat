@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { uploadImageToSupabase } from '../../services/imageUpload';
 // FIX: Correctly import Product type from a valid module.
 import { Product } from '../../types';
 import Card from '../common/Card';
@@ -55,37 +56,24 @@ const ProductEditModal: React.FC<ProductEditModalProps> = ({ product, onSave, on
         }
     };
 
-    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
             const file = e.target.files[0];
-            const reader = new FileReader();
-
-            setUploadProgress(0); // Start progress and show bar
-
-            // Simulate upload progress
-            const progressInterval = setInterval(() => {
-                setUploadProgress(prev => {
-                    // Stop before 100 to let the file reader finish
-                    if (prev === null || prev >= 95) {
-                        clearInterval(progressInterval);
-                        return prev;
-                    }
-                    return prev + 5;
-                });
-            }, 50); // Update every 50ms
-
-            reader.onloadend = () => {
-                clearInterval(progressInterval);
-                setUploadProgress(100);
-                setFormData(prev => ({ ...prev, imageUrl: reader.result as string }));
-                
-                // Hide progress bar after a short delay
-                setTimeout(() => {
-                    setUploadProgress(null);
-                }, 500);
-            };
-            
-            reader.readAsDataURL(file);
+            setUploadProgress(0);
+            // Upload to Supabase Storage
+            try {
+                // Optionally, you can show progress bar here (Supabase JS SDK does not provide progress natively)
+                const publicUrl = await uploadImageToSupabase(file);
+                if (publicUrl) {
+                    setFormData(prev => ({ ...prev, imageUrl: publicUrl }));
+                } else {
+                    alert('Image upload failed.');
+                }
+            } catch (err) {
+                alert('Image upload error.');
+            }
+            setUploadProgress(100);
+            setTimeout(() => setUploadProgress(null), 500);
         }
     };
 

@@ -159,12 +159,12 @@ const PosView: React.FC = () => {
     const total = useMemo(() => cart.reduce((sum, item) => sum + item.price * item.quantity, 0), [cart]);
 
     const handleCheckout = async (paymentMethod: PaymentMethod) => {
-        if (cart.length === 0) return;
-        
-        const saleData = { items: cart, total, paymentMethod, timestamp: new Date() };
-        await addSale(saleData);
-        setLastSale(saleData);
-        clearCart();
+    if (cart.length === 0 || !paymentMethod) return;
+    // Ensure paymentMethod is always set and not null
+    const saleData = { items: cart, total, paymentMethod };
+    await addSale(saleData);
+    setLastSale({ ...saleData, timestamp: new Date() });
+    clearCart();
     };
 
     const categories = useMemo(() => ['All', ...new Set(products.map(p => p.category))], [products]);

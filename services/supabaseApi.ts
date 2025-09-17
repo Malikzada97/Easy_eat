@@ -88,10 +88,14 @@ export const addSale = async (saleData: Omit<Sale, 'id' | 'timestamp'>): Promise
         throw new Error('Supabase not available');
     }
 
+    // Map paymentMethod to payment_method for Supabase
     const saleWithTimestamp = {
         ...saleData,
+        payment_method: saleData.paymentMethod,
         timestamp: new Date().toISOString()
     };
+    // Remove paymentMethod field to avoid column mismatch
+    delete (saleWithTimestamp as any).paymentMethod;
 
     const { data, error } = await supabase
         .from('sales')
